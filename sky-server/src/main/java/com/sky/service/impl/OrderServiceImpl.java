@@ -1,20 +1,28 @@
 package com.sky.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
+import com.sky.dto.OrdersPageQueryDTO;
+import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
 import com.sky.entity.AddressBook;
 import com.sky.entity.OrderDetail;
 import com.sky.entity.Orders;
 import com.sky.entity.ShoppingCart;
 import com.sky.exception.AddressBookBusinessException;
+import com.sky.exception.OrderBusinessException;
 import com.sky.exception.ShoppingCartBusinessException;
 import com.sky.mapper.AddressBookMapper;
 import com.sky.mapper.OrderDetailMapper;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.ShoppingCartMapper;
+import com.sky.result.PageResult;
 import com.sky.service.OrderService;
+import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderSubmitVO;
+import com.sky.vo.OrderVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -88,13 +96,71 @@ public class OrderServiceImpl implements OrderService {
         //清空当前用户的购物车数据
         shoppingCartMapper.deleteByUserId(userId);
         //封装VO返回结果
-        OrderSubmitVO.builder()
+        OrderSubmitVO orderSubmitVO = OrderSubmitVO.builder()
                 .id(orders.getId())
                 .orderTime(orders.getOrderTime())
                 .orderNumber(orders.getNumber())
                 .orderAmount(orders.getAmount())
                 .build();
-        return null;
+        return orderSubmitVO;
+    }
+
+    //模拟微信支付方法
+    public OrderPaymentVO payment(OrdersPaymentDTO ordersPaymentDTO) throws Exception{
+        // 直接调用支付成功逻辑
+        // 数据库里的订单状态改成“待接单”
+        paySuccess(ordersPaymentDTO.getOrderNumber());
+
+
+        // 前端收到 code: 0，就不会去调用微信支付，而是直接弹个提示
+        throw new OrderBusinessException("模拟支付成功，请去订单列表查看最新状态！");
+    }
+
+    //模拟支付成功并修改订单状态
+    public void paySuccess(String outTradeNo){
+        //根据订单号查询订单
+        Orders ordersDB= orderMapper.getByNumber(outTradeNo);
+        //如果订单不存在或者已经支付过了，直接返回
+        if(ordersDB==null||ordersDB.getPayStatus()==Orders.PAID){
+            return;
+        }
+        //根据订单更新订单的状态，支付方式，支付状态，结账时间
+        Orders orders = new Orders();
+        orders.setId(ordersDB.getId());
+        orders.setStatus(Orders.TO_BE_CONFIRMED); // 变为待接单
+        orders.setPayStatus(Orders.PAID);         // 变为已支付
+        orders.setCheckoutTime(LocalDateTime.now());
+
+        orderMapper.update(orders);
+    }
+
+
+    @Override
+    public PageResult pageQuery4User(int pageNum, int pageSize, Integer status) {
+        PageHelper.startPage(pageNum,pageSize);
+
+        OrdersPageQueryDTO ordersPageQueryDTO = new OrdersPageQueryDTO();
+
+        ordersPageQueryDTO.setUserId(BaseContext.getCurrentId());
+        ordersPageQueryDTO.setStatus(status);
+
+        Page<Orders> page=orderMapper.pageQuery(ordersPageQueryDTO);
+
+       List<OrderVO> list = new ArrayList();
+
+       if(page!=null&&page.getTotal()>0){
+           for (Orders orders:page){
+               Long orderId = orders.getId();
+               List<OrderDetail> orderDetails=orderDetailMapper.getByOrderId(orderId);
+
+               OrderVO orderVO=new OrderVO();
+               BeanUtils.copyProperties(orders,orderVO);
+               orderVO.setOrderDetailList(orderDetails);
+
+               list.add(orderVO);
+           }
+       }
+       return new PageResult(page.getTotal(),list);
     }
 
 

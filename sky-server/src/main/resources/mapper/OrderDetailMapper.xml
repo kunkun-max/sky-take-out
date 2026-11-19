@@ -10,7 +10,7 @@
         <foreach collection="orderDetailList" item="od" separator=",">
             (#{od.name},#{od.image},#{od.orderId},#{od.dishId},#{od.setmealId},#{od.dishFlavor},#{od.number},#{od.amount})
         </foreach>
-
-
     </insert>
+
+
 </mapper>

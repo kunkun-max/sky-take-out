@@ -55,6 +55,10 @@ public class AddressBookServiceImpl implements AddressBookService {
         addressBook.setIsDefault(0);
         addressBook.setUserId(BaseContext.getCurrentId());
         addressBookMapper.updateIsDefaultByUserId(addressBook);
+
+        //2.将当前传入的地址修改为默认地址
+        addressBook.setIsDefault(1);
+        addressBookMapper.update(addressBook);
     }
 
     @Override
