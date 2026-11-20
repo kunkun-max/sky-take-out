@@ -25,6 +25,7 @@ import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -78,6 +79,7 @@ public class OrderServiceImpl implements OrderService {
         orders.setStatus(Orders.PENDING_PAYMENT);
         orders.setNumber(String.valueOf(System.currentTimeMillis()));
         orders.setPhone(addressBook.getPhone());
+        orders.setAddress(addressBook.getDetail());
         orders.setConsignee(addressBook.getConsignee());
         orders.setUserId(userId);
 
@@ -161,6 +163,19 @@ public class OrderServiceImpl implements OrderService {
            }
        }
        return new PageResult(page.getTotal(),list);
+    }
+
+    @Override
+        public OrderVO details(Long id) {
+       Orders orders  =orderMapper.getById(id);
+
+       List<OrderDetail>orderDetailList=orderDetailMapper.getByOrderId(orders.getId());
+
+        OrderVO orderVO = new OrderVO();
+        BeanUtils.copyProperties(orders,orderVO);
+        orderVO.setOrderDetailList(orderDetailList);
+
+        return orderVO;
     }
 
 
