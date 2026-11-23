@@ -47,6 +47,10 @@ sky:
     user-secret-key: kunkun_max
     user-ttl: 7200000
     user-token-name: authentication
+  shop:
+    address: 广州市白云区广东技术师范大学白云校区
+  baidu:
+    ak: HrNhKfsDvWOmj3Xa4TG0EWyZzropQF8Z
   github:
     token: ${sky.github.token}
     owner: ${sky.github.owner}
@@ -54,5 +58,5 @@ sky:
     branch: ${sky.github.branch}
     cdn: ${sky.github.cdn}
   wechat:
-  appid: ${sky.wechat.appid}
-  secret: ${sky.wechat.secret}
+    appid: ${sky.wechat.appid}
+    secret: ${sky.wechat.secret}
