@@ -11,5 +11,20 @@
     </insert>
 
 
+    <select id="getNewUsersByDateRange" resultType="com.sky.dto.DateCountDTO">
+        select
+            DATE (create_time) as date,
+            count(id) as count
+        from user
+        where create_time &gt;= #{begin}
+        and create_time &lt; #{end}
+        group by DATE (create_time)
+    </select>
+
+    <select id="getTotalUserBeforeDate" resultType="java.lang.Integer">
+        select count(id)from user
+        where create_time &lt; #{dateTime}
+    </select>
+
 
 </mapper>
