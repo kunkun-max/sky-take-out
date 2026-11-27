@@ -130,4 +130,10 @@ public interface OrderMapper {
      */
     List<GoodsSalesDTO>getSalesTop(LocalDateTime begin,LocalDateTime end);
 
+    /**
+     * 查询时间段内的总订单数
+     * @param map
+     * @return
+     */
+    Integer countByMap(@Param("map")Map map);
 }

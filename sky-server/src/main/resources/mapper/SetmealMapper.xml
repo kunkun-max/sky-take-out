@@ -85,4 +85,13 @@
         </where>
     </select>
 
+    <select id="countByMap" resultType="java.lang.Integer">
+        select count(id)
+        from setmeal
+        <where>
+            <if test="map.status">
+                and status=#{map.status}
+            </if>
+        </where>
+    </select>
 </mapper>

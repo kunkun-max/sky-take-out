@@ -38,4 +38,11 @@ public interface UserMapper {
      * @return
      */
     Integer getTotalUserBeforeDate(@Param("dateTime")LocalDateTime dateTime);
+
+    /**
+     *
+     * @param map
+     * @return
+     */
+    Integer countByMap(@Param("map")Map map);
 }
