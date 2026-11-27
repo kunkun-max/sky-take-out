@@ -1,13 +1,14 @@
 package com.sky.mapper;
 
 import com.github.pagehelper.Page;
+import com.sky.dto.DateCountDTO;
+import com.sky.dto.GoodsSalesDTO;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
-import org.springframework.core.annotation.Order;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -103,4 +104,30 @@ public interface OrderMapper {
      * @return
      */
     Double sumByMap(@Param("map") Map map);
+
+    /**
+     * 统计指定时间段内每日订单总数
+     *
+     * @param begin
+     * @param end
+     * @return
+     */
+    List<DateCountDTO> getDailyOrderCounts(@Param("begin")LocalDateTime begin,@Param("end") LocalDateTime end);
+
+    /**
+     * 统计指定时间段内每日有效订单数
+     * @param begin
+     * @param end
+     * @return
+     */
+    List<DateCountDTO> getDailyValidOrderCounts(@Param("begin") LocalDateTime begin,@Param("end") LocalDateTime end);
+
+    /**
+     * 统计指定时间段内的销量排名
+     * @param begin
+     * @param end
+     * @return
+     */
+    List<GoodsSalesDTO>getSalesTop(LocalDateTime begin,LocalDateTime end);
+
 }
